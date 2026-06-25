@@ -1,0 +1,10 @@
+{
+  "name": "Bharat Marketplace",
+  "description": "A comprehensive, high-fidelity Marketplace Platform featuring beautiful responsive web, native Android/iOS mobile views, real-time chat simulations, full-featured admin/user panels, and Gemini-powered smart ad writing and moderation tools.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
