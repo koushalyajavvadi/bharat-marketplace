@@ -73,31 +73,51 @@ export default function App() {
     fetchInitialData();
   }, []);
 
-  const fetchInitialData = async () => {
-    try {
-      const userRes = await fetch("/api/user/me");
-      const userData = await userRes.json();
-      setCurrentUser(userData);
+ const fetchInitialData = async () => {
+  try {
+    const fetchJson = async (url: string) => {
+      const response = await fetch(url);
 
-      const adsRes = await fetch("/api/ads");
-      const adsData = await adsRes.json();
-      setAds(adsData);
+      if (!response.ok) {
+        console.error(`API Error: ${url} returned ${response.status}`);
+        return null;
+      }
 
-      const chatsRes = await fetch("/api/chats");
-      const chatsData = await chatsRes.json();
-      setChats(chatsData);
+      const contentType = response.headers.get("content-type");
 
-      const notRes = await fetch("/api/notifications");
-      const notData = await notRes.json();
-      setNotifications(notData);
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error(`Expected JSON from ${url}, got:`, text);
+        return null;
+      }
 
-      const repRes = await fetch("/api/reports");
-      const repData = await repRes.json();
-      setReports(repData);
-    } catch (err) {
-      console.error("Failed to load initial server context:", err);
-    }
-  };
+      return response.json();
+    };
+
+    const [
+      userData,
+      adsData,
+      chatsData,
+      notificationsData,
+      reportsData
+    ] = await Promise.all([
+      fetchJson("/api/user/me"),
+      fetchJson("/api/ads"),
+      fetchJson("/api/chats"),
+      fetchJson("/api/notifications"),
+      fetchJson("/api/reports")
+    ]);
+
+    if (userData) setCurrentUser(userData);
+    if (adsData) setAds(adsData);
+    if (chatsData) setChats(chatsData);
+    if (notificationsData) setNotifications(notificationsData);
+    if (reportsData) setReports(reportsData);
+
+  } catch (err) {
+    console.error("Failed to load initial server context:", err);
+  }
+};
 
   // Switch authenticated login roles dynamically for live testing
   const handleLoginAs = async (role: UserRole) => {
